@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600">
+	<fx:Declarations>
+		<s:WebService id="serviceConversion" wsdl="http://www.webservicex.net/ConvertTemperature.asmx?WSDL">
+			<s:operation name="ConvertTemp" resultFormat="object" 
+						 fault="resultatKO(event)" result="resultatOK(event)"/>
+		</s:WebService>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			//Procedure affichant l'erreur d'execution
+			public function resultatKO(e:FaultEvent):void{
+				Alert.show("ERREUR "+e.fault.faultString);
+			}
+			
+			//Recuperation du resultat envoye par le service web
+			public function resultatOK(e:ResultEvent):void{
+				degresF_txt.text= String(e.result);
+			}
+			
+			//Execution du service
+			public function executerWebService():void{
+				var temperature:String = degresC_txt.text;
+				var uniteSource:String = "degreeCelsius";
+				var uniteConversion:String = "degreeFahrenheit";
+				
+				//Appel du web service
+				serviceConversion.ConvertTemp(temperature, uniteSource, uniteConversion);
+			}
+		]]>
+	</fx:Script>
+	
+	<!-- FORMULAIRE -->
+	<s:Panel x="10" y="10" width="379" height="183" title="WebService : Conversion de temperature">
+		<s:Form x="10" y="10" width="339" height="87">
+			<s:FormItem label="Temperature en degres Celsius : ">
+				<s:TextInput width="79" id="degresC_txt"/>
+			</s:FormItem>
+			<s:FormItem label="Temperature en degres Fahrenheit : ">
+				<s:TextInput width="81" editable="false" enabled="true" id="degresF_txt"/>
+			</s:FormItem>
+		</s:Form>
+		<s:Button x="10" y="105" label="Convertir" id="btn_executer" click="executerWebService()" width="339"/>
+	</s:Panel>
+</s:Application>
